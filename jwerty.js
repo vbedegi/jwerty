@@ -35,7 +35,12 @@
             return selector ? $.querySelector(selector, context || $) : $;
         };
         
-        $b = function (e, fn) { e.addEventListener(ke, fn, false); };
+        $b = function (e, fn) { 
+            e.addEventListener(ke, fn, false); 
+            return function() {
+                e.removeEventListener(ke, fn, false);
+            };
+        };
         $f = function (e, jwertyEv) {
             var ret = document.createEvent('Event')
             ,   i;
@@ -48,7 +53,12 @@
         }
     } else {
         $$ = function (selector, context, fn) { return $(selector || $d, context); };
-        $b = function (e, fn) { $(e).bind(ke + '.jwerty', fn); };
+        $b = function (e, fn) { 
+            $(e).bind(ke + '.jwerty', fn); 
+            return function() {
+                $(e).unbind(ke + '.jwerty', fn); 
+            };
+        };
         $f = function (e, ob) { $(e || $d).trigger($.Event(ke, ob)); };
     }
     
@@ -427,7 +437,7 @@
             
             // If `realSelector` is already a jQuery/Zepto/Ender/DOM element,
             // then just use it neat, otherwise find it in DOM using $$()
-            $b(realTypeOf(realSelector, 'element') ?
+            return $b(realTypeOf(realSelector, 'element') ?
                realSelector : $$(realSelector, realSelectorContext)
             , jwerty.event(jwertyCode, callbackFunction, realcallbackContext));
         },
